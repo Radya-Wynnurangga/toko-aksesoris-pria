@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrodoStore - Marketplace Accessories Pria</title>
+<style>
+    * {margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif;}
+  body {background:#f5f5f5; color:#222;}
+  
+  header {background:#0A0A0A; color:#fff; padding:15px 5%; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100;}
+  header h1 {font-size:22px; letter-spacing:2px;}
+  header h1 span {color:#D4AF37;}
+  .header-nav {display:flex; gap:15px; align-items:center;}
+  .header-nav button {background:#D4AF37; color:#000; border:none; padding:8px 14px; border-radius:5px; cursor:pointer; font-weight:600;}
+  .header-nav button:hover {background:#fff;}
+  .nav-link {color:#fff; cursor:pointer; padding:8px 10px; border-radius:5px;}
+  .nav-link:hover {background:#D4AF37; color:#000;}
+
+  .page {display:none; padding:30px 5%; min-height:80vh;}
+  .active {display:block;}
+
+  /* AUTH */
+  .auth-wrap {display:flex; justify-content:center; align-items:center; height:80vh; background:linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1441984904996-e50b1ba2a0f6?q=80&w=1200') center/cover;}
+  .auth-box {background:#fff; padding:35px; border-radius:12px; width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+  .auth-box h2 {text-align:center; margin-bottom:20px;}
+  .auth-box input, .auth-box textarea, .auth-box select {width:100%; padding:12px; margin-bottom:12px; border:1px solid #ddd; border-radius:6px;}
+  .auth-btn {width:100%; padding:12px; background:#0A0A0A; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold;}
+  .auth-btn:hover {background:#D4AF37; color:#000;}
+  .switch-auth {text-align:center; margin-top:12px; font-size:14px; cursor:pointer; color:#0A0A0A; text-decoration:underline;}
+
+  /* PRODUK */
+  .search-bar {margin-bottom:25px;}
+  .search-bar input {width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;}
+  .products {display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px;}
+  .card {background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,0.08);}
+  .card img {width:100%; height:220px; object-fit:cover;}
+  .card-body {padding:15px;}
+  .price {color:#D4AF37; font-weight:bold; font-size:18px; margin:8px 0;}
+  .card-actions {display:flex; gap:10px; margin-top:10px;}
+  .btn {flex:1; background:#0A0A0A; color:#fff; border:none; padding:10px; border-radius:5px; cursor:pointer;}
+  .btn:hover {background:#D4AF37; color:#000;}
+  .btn-wish {background:#fff; color:#000; border:1px solid #ccc; flex:0 0 45px;}
+
+  /* LIST */
+  .list-item {background:#fff; padding:15px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;}
+  .total {font-weight:bold; font-size:20px; color:#D4AF37; margin:15px 0;}
+
+  footer {background:#0A0A0A; color:#aaa; text-align:center; padding:20px; margin-top:40px;}
+</style>
+</head>
+<body>
+
+<header id="main-header" style="display:none;">
+  <h1 onclick="showPage('home-page')" style="cursor:pointer;">BRODO<span>STORE</span></h1>
+  <div class="header-nav">
+    <span class="nav-link" onclick="showPage('home-page')">Home</span>
+    <span class="nav-link" onclick="showPage('search-page')">Cari</span>
+    <span class="nav-link" onclick="showPage('wishlist-page')">Wishlist</span>
+    <span class="nav-link" onclick="showPage('alamat-page')">Alamat</span>
+    <span class="nav-link" onclick="showPage('cart-page')">Keranjang</span>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<!-- 1. HALAMAN AUTH -->
+<div id="auth-page" class="page active">
+  <div class="auth-wrap">
+    <div class="auth-box" id="login-box">
+      <h2>Login</h2>
+      <input type="text" id="login-user" placeholder="Username">
+      <input type="password" id="login-pass" placeholder="Password">
+      <button class="auth-btn" onclick="login()">Masuk</button>
+      <p class="switch-auth" onclick="switchAuth()">Belum punya akun? Daftar</p>
+      <p style="text-align:center; margin-top:10px; font-size:12px; color:#666;">Demo: admin / 123</p>
+    </div>
+    <div class="auth-box" id="register-box" style="display:none;">
+      <h2>Daftar Akun</h2>
+      <input type="text" id="reg-user" placeholder="Username">
+      <input type="email" id="reg-email" placeholder="Email">
+      <input type="password" id="reg-pass" placeholder="Password">
+      <button class="auth-btn" onclick="register()">Daftar</button>
+      <p class="switch-auth" onclick="switchAuth()">Sudah punya akun? Login</p>
+    </div>
+  </div>
+</div>
+
+<!-- 2. HALAMAN MENU UTAMA -->
+<div id="home-page" class="page">
+  <h2>Koleksi Accessories Pria</h2>
+  <div class="products" id="product-list"></div>
+</div>
+
+<!-- 3. HALAMAN CARI BARANG -->
+<div id="search-page" class="page">
+  <h2>Cari Barang</h2>
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Cari jam, dompet, tas, sepatu..." onkeyup="searchProduct()">
+  </div>
+  <div class="products" id="search-list"></div>
+</div>
+
+<!-- 4. HALAMAN WISHLIST -->
+<div id="wishlist-page" class="page">
+  <h2>Wishlist ❤️</h2>
+  <div id="wishlist-items"></div>
+</div>
+
+<!-- 5. HALAMAN ALAMAT -->
+<div id="alamat-page" class="page">
+  <h2>Alamat Pengiriman</h2>
+  <div class="auth-box" style="margin:0 auto;">
+    <textarea id="alamat" placeholder="Nama, Alamat Lengkap, No HP, Titik Maps" rows="4"></textarea>
+    <button class="auth-btn" onclick="simpanAlamat()">Simpan Alamat</button>
+    <p id="alamat-saved" style="margin-top:10px; color:green;"></p>
+  </div>
+</div>
+
+<!-- 6. HALAMAN KERANJANG + CHECKOUT -->
+<div id="cart-page" class="page">
+  <h2>Keranjang Belanja 🛒</h2>
+  <div id="cart-items"></div>
+  <div class="total" id="cart-total"></div>
+  
+  <!-- 7. HALAMAN METODE PEMBAYARAN -->
+  <h3>Pilih Metode Pembayaran</h3>
+  <select id="pembayaran" style="width:100%; padding:12px; margin-bottom:15px; border-radius:6px;">
+    <option value="Transfer Bank">Transfer Bank</option>
+    <option value="COD">COD - Bayar di Tempat</option>
+    <option value="E-Wallet">E-Wallet: OVO/Gopay/Dana</option>
+  </select>
+
+  <button class="auth-btn" onclick="checkout()">Checkout Sekarang</button>
+</div>
+
+<footer>© 2026 BrodoStore Indonesia. For Gentlemen Only.</footer>
+
+<script>
+// DATA PRODUK
+const products = [
+  {id:1, name:"Dompet Kulit Asli V1", price:349000, img:"https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=600"},
+  {id:2, name:"Jam Tangan Minimalis Steel", price:899000, img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZX0Taji0B_fI2t-TF57Su3IXM6-Lx5U8Ab9zGa4N9xg&s"},
+  {id:3, name:"Tas Sling Bag Canvas Premium", price:499000, img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFsiV5RFAZGjDZ6sCARg_OviDQgG91lrunfmIjL2DJcg&s=10"},
+  {id:4, name:"Ikat Pinggang Kulit Original", price:249000, img:"https://down-id.img.susercontent.com/file/bec7630cf85e37e6c032fc33137b28ec"},
+  {id:5, name:"Sepatu Oxford Formal Black", price:1299000, img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlRr5H6AguSmlh-4hyiU9ohf4xXn-GAzhGVoNnVt9yIA&s=10"},
+  {id:6, name:"Cufflink Silver Classic", price:199000, img:"https://image.made-in-china.com/202f0j00lDyqOkwBMQge/Suit-Shirt-Cuff-Links-Simple-Customized-Engraved-High-Polish-Wholesale-Stainless-Steel-Blank-Round-Cufflinks-for-Men.webp"}
+];
+
+let users = JSON.parse(localStorage.getItem('brodo_users')) || [];
+let currentUser = localStorage.getItem('brodo_currentUser');
+let cart = JSON.parse(localStorage.getItem('brodo_cart')) || [];
+let wishlist = JSON.parse(localStorage.getItem('brodo_wishlist')) || [];
+let alamat = localStorage.getItem('brodo_alamat') || "";
+
+// SISTEM PAGE
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id === 'home-page') renderProducts();
+  if(id === 'wishlist-page') renderWishlist();
+  if(id === 'cart-page') renderCart();
+  if(id === 'search-page') renderProducts(document.getElementById('search-list'));
+}
+
+// AUTH
+function switchAuth() {
+  document.getElementById('login-box').style.display = document.getElementById('login-box').style.display === 'none' ? 'block' : 'none';
+  document.getElementById('register-box').style.display = document.getElementById('register-box').style.display === 'none' ? 'block' : 'none';
+}
+
+function register() {
+  const username = document.getElementById('reg-user').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-pass').value.trim();
+  if(!username || !email || !password) return alert('Semua field wajib diisi!');
+  if(users.find(u => u.username === username)) return alert('Username sudah terdaftar!');
+  users.push({username, email, password});
+  localStorage.setItem('brodo_users', JSON.stringify(users));
+  alert('Daftar berhasil! Silakan login');
+  switchAuth();
+}
+
+function login() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value.trim();
+  const found = users.find(x => x.username === u && x.password === p);
+  if(found || (u==='admin' && p==='123')) {
+    currentUser = u;
+    localStorage.setItem('brodo_currentUser', u);
+    document.getElementById('main-header').style.display = 'flex';
+    showPage('home-page');
+  } else alert('Username atau Password salah!');
+}
+
+function logout() {
+  localStorage.removeItem('brodo_currentUser');
+  currentUser = null;
+  document.getElementById('main-header').style.display = 'none';
+  document.getElementById('login-user').value = "";
+  document.getElementById('login-pass').value = "";
+  showPage('auth-page');
+}
+
+// PRODUK
+function renderProducts(target=document.getElementById('product-list')) {
+  target.innerHTML = products.map(p => `
+    <div class="card">
+      <img src="${p.img}" alt="${p.name}">
+      <div class="card-body">
+        <h3>${p.name}</h3>
+        <div class="price">Rp ${p.price.toLocaleString('id-ID')}</div>
+        <div class="card-actions">
+          <button class="btn" onclick="addToCart(${p.id})">+ Keranjang</button>
+          <button class="btn btn-wish" onclick="addToWishlist(${p.id})">❤️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function searchProduct() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const filtered = products.filter(p => p.name.toLowerCase().includes(q));
+  renderProducts(document.getElementById('search-list'));
+  if(q === "") renderProducts(document.getElementById('search-list'));
+}
+
+// WISHLIST
+function addToWishlist(id) {
+  const item = products.find(p => p.id === id);
+  if(!wishlist.find(w => w.id === id)) {
+    wishlist.push(item);
+    localStorage.setItem('brodo_wishlist', JSON.stringify(wishlist));
+    alert(item.name + ' ditambahkan ke Wishlist');
+  } else alert('Sudah ada di Wishlist');
+}
+
+function renderWishlist() {
+  const el = document.getElementById('wishlist-items');
+  el.innerHTML = wishlist.length === 0 ? '<p>Wishlist kosong</p>' : 
+    wishlist.map(i => `<div class="list-item"><span>${i.name} - Rp ${i.price.toLocaleString('id-ID')}</span><button class="btn" onclick="addToCart(${i.id})">Beli</button></div>`).join('');
+}
+
+// CART
+function addToCart(id) {
+  const item = products.find(p => p.id === id);
+  cart.push(item);
+  localStorage.setItem('brodo_cart', JSON.stringify(cart));
+  alert(item.name + ' ditambahkan ke Keranjang');
+}
+
+function renderCart() {
+  const el = document.getElementById('cart-items');
+  el.innerHTML = cart.length === 0 ? '<p>Keranjang kosong</p>' : 
+    cart.map((i, idx) => `<div class="list-item"><span>${i.name}</span><span>Rp ${i.price.toLocaleString('id-ID')}</span></div>`).join('');
+  const total = cart.reduce((a,b) => a + b.price, 0);
+  document.getElementById('cart-total').innerText = total > 0 ? 'Total: Rp ' + total.toLocaleString('id-ID') : '';
+}
+
+// ALAMAT
+function simpanAlamat() {
+  alamat = document.getElementById('alamat').value.trim();
+  localStorage.setItem('brodo_alamat', alamat);
+  document.getElementById('alamat-saved').innerText = "Alamat berhasil disimpan!";
+}
+
+// CHECKOUT
+function checkout() {
+  if(cart.length === 0) return alert('Keranjang masih kosong');
+  if(alamat === '') return alert('Isi alamat pengiriman dulu di menu Alamat');
+  const metode = document.getElementById('pembayaran').value;
+  const total = cart.reduce((a,b) => a + b.price, 0);
+  alert(`Checkout Berhasil!\n\nTotal Bayar: Rp ${total.toLocaleString('id-ID')}\nAlamat: ${alamat}\nMetode: ${metode}`);
+  cart = [];
+  localStorage.setItem('brodo_cart', JSON.stringify(cart));
+  renderCart();
+}
+
+// LOAD
+window.onload = () => {
+  document.getElementById('alamat').value = alamat;
+  if(currentUser) {
+    document.getElementById('main-header').style.display = 'flex';
+    showPage('home-page');
+  }
+}
+</script>
+</body>
+</html>
